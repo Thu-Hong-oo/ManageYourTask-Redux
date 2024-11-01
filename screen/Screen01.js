@@ -1,3 +1,5 @@
+// src/components/AssetExample.js
+import React from 'react';
 import {
   Text,
   View,
@@ -7,28 +9,33 @@ import {
   TextInput,
   Pressable,
 } from 'react-native';
-import {useState} from 'react'
-import COLORS from '../components/COLOR';
+import { useDispatch, useSelector } from 'react-redux'; // Nhập useDispatch và useSelector từ react-redux
 import { Icon } from 'react-native-elements';
-export default function AssetExample({navigation}) {
-   const [name, setName] = useState('');
+import COLORS from '../components/COLOR';
+import { setName } from '../redux/actions'; // Nhập action setName
+
+export default function AssetExample({ navigation }) {
+  const dispatch = useDispatch(); // Khởi tạo dispatch
+  const name = useSelector(state => state.name); // Lấy name từ Redux store
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={{ flex: 1.5 }}>
         <Image source={require('../assets/note.png')} />
       </View>
-      <View style={{ flex: 2 , justifyContent:"center", alignItems:"center"}}>
+      <View style={{ flex: 2, justifyContent: "center", alignItems: "center" }}>
         <Text style={styles.manage}> MANAGE YOUR {'\n'}TASK</Text>
         <View style={styles.containerInput}>
           <Icon name="mail" type="antdesign" color="gray" />
           <TextInput
             placeholder="Enter your mail"
             placeholderTextColor="gray"
-            value = {name}
-            onChangeText={text =>setName(text)}
-            ></TextInput>
+            style={{ marginHorizontal: 10, width: "100%" }}
+            value={name} // Sử dụng name từ Redux store
+            onChangeText={text => dispatch(setName(text))} // Cập nhật name trong Redux store
+          />
         </View>
-        <Pressable onPress={() => {navigation.navigate("Screen02",{name})}} style={styles.pressable}>
+        <Pressable onPress={() => { navigation.navigate("Screen02"); }} style={styles.pressable}>
           <Text style={{ textAlign: 'center', color: 'white' }}>
             GET STARTED
           </Text>
@@ -47,10 +54,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 5,
     width: '60%',
-    borderRadius:10,
+    borderRadius: 10,
   },
   containerInput: {
-    width:"100%",
+    width: "100%",
     flexDirection: 'row',
     borderWidth: 1,
     borderRadius: 10,

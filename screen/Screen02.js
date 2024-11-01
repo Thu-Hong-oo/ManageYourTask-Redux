@@ -12,57 +12,45 @@ import {
 import { Icon, Avatar } from 'react-native-elements';
 import { useDispatch, useSelector } from 'react-redux'; // Import useDispatch and useSelector
 import COLOR from '../components/COLOR';
-
 import {
-  fetchTasksStart,
-  addTaskSuccess,
-  editTaskSuccess,
-  deleteTaskSuccess,
-} from '../slices/taskSlide'; // Adjust this according to your actual slice path
+  setName,
+  fetchTodosRequest,
+  addTodo,
+  deleteTodo,
+} from '../redux/actions';
 
 const AssetExample = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const tasks = useSelector((state) => state.tasks.data); // Replace with the correct path to your tasks
-  const name = route?.params?.name || 'Guest';
+  const name = useSelector((state) => state.name);
+  const todos = useSelector((state) => state.todos);
+  const error = useSelector((state) => state.error);
   const [search, setSearch] = useState('');
 
-  // Fetch Tasks from API when the component mounts
-  useEffect(() => {
-    dispatch(fetchTasksStart()); // Dispatch action to fetch tasks
+  React.useEffect(() => {
+    dispatch(fetchTodosRequest()); // Lấy dữ liệu khi component mount
   }, [dispatch]);
 
-  // Handle adding a new task
-  useEffect(() => {
-    if (route.params?.newJob) {
-      const newTask = { task: route.params.newJob };
-      dispatch(addTaskSuccess(newTask)); // Dispatch action to add the new task
-    }
-  }, [route.params?.newJob, dispatch]);
-
-  // Handle editing a task
-  useEffect(() => {
-    if (route.params?.editedJob) {
-      const editedTask = route.params.editedJob;
-      dispatch(editTaskSuccess(editedTask)); // Dispatch action to edit the task
-    }
-  }, [route.params?.editedJob, dispatch]);
-
-  // Filter data based on search input
-  const filterData = tasks.filter((item) =>
-    item.task.toLowerCase().includes(search.toLowerCase())
-  );
-
-  // Confirm and delete task
-  const confirmDeleteTask = (id) => {
-    Alert.alert(
-      'Confirm Deletion',
-      'Are you sure you want to delete this task?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Yes', onPress: () => dispatch(deleteTaskSuccess(id)) }, // Dispatch action to delete the task
-      ]
-    );
+   const handleDeleteTodo = (id) => {
+      dispatch(deleteTodo(id));
   };
+//   const handleDeleteTodo = (id) => {
+//     Alert.alert(
+//       'Xác nhận xóa',
+//       'Bạn có chắc chắn muốn xóa mục này?',
+//       [
+//         {
+//           text: 'Hủy',
+//           onPress: () => console.log('Đã hủy xóa'),
+//           style: 'cancel',
+//         },
+//         {
+//           text: 'Xóa',
+//           onPress: () => dispatch(deleteTodo(id)), // Gọi action xóa todo
+//         },
+//       ],
+//       { cancelable: false }
+//     );
+// n
 
   // Render each task item
   const renderTask = ({ item }) => (
@@ -80,7 +68,7 @@ const AssetExample = ({ navigation, route }) => {
           }>
           <Icon name="edit" color="red" />
         </Pressable>
-        <Pressable onPress={() => confirmDeleteTask(item.id)}>
+        <Pressable onPress={() => handleDeleteTodo(item.id)}>
           <Icon name="delete" color="red" />
         </Pressable>
       </View>
@@ -116,6 +104,7 @@ const AssetExample = ({ navigation, route }) => {
             placeholderTextColor="gray"
             value={search}
             onChangeText={setSearch}
+            style={{ width: '80%', paddingVertical: 3, marginLeft: 5 }}
           />
         </View>
       </View>
@@ -123,7 +112,7 @@ const AssetExample = ({ navigation, route }) => {
       {/* Task List */}
       <View style={styles.list}>
         <FlatList
-          data={filterData}
+          data={todos}
           renderItem={renderTask}
           keyExtractor={(item) => item.id} // Use id as key
         />
@@ -140,7 +129,7 @@ const AssetExample = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  add: { flex: 1 },
+  add: { flex: 1 ,marginTop:20},
   list: { flex: 3 },
   search: {
     marginHorizontal: 10,

@@ -10,19 +10,27 @@ import {
 } from 'react-native';
 import { Icon, Avatar } from 'react-native-elements';
 import COLOR from '../components/COLOR';
+import { useDispatch, useSelector } from 'react-redux';
+import { addTodo, updateTodo } from '../redux/actions';
 
 export default function Screen03({ navigation, route }) {
-  const name = route?.params?.name || 'Guest';
-  const editTask = route?.params?.editTask || null; // Nhận task nếu có
+  //const name = route?.params?.name || 'Guest';
+  const dispatch = useDispatch();
+  const name = useSelector((state) => state.name);
+  const editTask = route?.params?.editTask || null;
   const [job, setJob] = useState(editTask?.task || '');
   const title = editTask ? 'EDIT YOUR JOB' : 'ADD YOUR JOB';
+
   const handleFinish = () => {
     if (job.trim()) {
       if (editTask) {
-      navigation.navigate('Screen02', { editedJob: { ...editTask, task: job } });
+        const updatedTask = { ...editTask, task: job };
+        dispatch(updateTodo(updatedTask));
       } else {
-        navigation.navigate('Screen02', { newJob: job });
+        const newTask = { id: Date.now(), task: job };
+        dispatch(addTodo(newTask));
       }
+      navigation.navigate('Screen02');
     }
   };
 
@@ -30,7 +38,11 @@ export default function Screen03({ navigation, route }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Avatar rounded size="medium" source={require('../assets/Avatar.png')} />
+          <Avatar
+            rounded
+            size="medium"
+            source={require('../assets/Avatar.png')}
+          />
           <View>
             <Text style={styles.greeting}>Hi {name}</Text>
             <Text>Have a great day ahead</Text>
@@ -51,7 +63,7 @@ export default function Screen03({ navigation, route }) {
             placeholderTextColor="gray"
             value={job}
             onChangeText={setJob}
-            style={{ flex: 1 }}
+            style={{ flex: 1, paddingVertical: 3 }}
           />
         </View>
         <Pressable onPress={handleFinish} style={styles.button}>
@@ -60,7 +72,11 @@ export default function Screen03({ navigation, route }) {
       </View>
 
       <View style={styles.imageContainer}>
-        <Image source={require('../assets/note.png')} style={styles.image} resizeMode="contain" />
+        <Image
+          source={require('../assets/note.png')}
+          style={styles.image}
+          resizeMode="contain"
+        />
       </View>
     </SafeAreaView>
   );
@@ -71,6 +87,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     backgroundColor: 'white',
+ 
   },
   header: {
     flexDirection: 'row',
@@ -88,6 +105,7 @@ const styles = StyleSheet.create({
     flex: 2,
     width: '90%',
     alignItems: 'center',
+    
   },
   title: {
     fontSize: 25,
@@ -98,10 +116,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 7,
-    width: '100%',
+    width: '90%',
     borderWidth: 1,
-    marginHorizontal: 20,
-    marginLeft:20,
+    marginHorizontal: 30,
+
+    justifyContent:"center"
   },
   button: {
     marginTop: 50,
